@@ -34,8 +34,8 @@ public class UIManager : Singleton<UIManager>
 
         //≥ı ºªØvalue
         health.text = "Health: " + PlayerManager.Instance.playerData.health;
-        money.text = "Money" + PlayerManager.Instance.playerData.money;
-        attack.text = "Attack " + PlayerManager.Instance.playerData.attackPower;
+        money.text = "Money: " + PlayerManager.Instance.playerData.money;
+        attack.text = "Attack: " + PlayerManager.Instance.playerData.attackPower;
 
 
         inventory.items = new List<Item>();
