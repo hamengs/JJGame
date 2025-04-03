@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Enemy
+  - DeadZone
   layers:
   - Default
   - TransparentFX
@@ -62,6 +63,15 @@ TagManager:
     locked: 0
   - name: 7
     uniqueID: 3555012127
+    locked: 0
+  - name: 8
+    uniqueID: 2934788243
+    locked: 0
+  - name: 9
+    uniqueID: 2589548293
+    locked: 0
+  - name: 10
+    uniqueID: 3340385373
     locked: 0
   m_RenderingLayers:
   - Default

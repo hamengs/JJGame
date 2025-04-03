@@ -1,9 +1,15 @@
+using System;
 using UnityEngine;
 
 public class PlayerManager : Singleton<PlayerManager>
 {
     public PlayerData playerData;
     public PlayerController playerController;
+    public bool isPlayerDead = false;
+
+    public event Action OnPlayerDeath;
+
+
     private void Awake()
     {
         base.Awake();
@@ -18,7 +24,11 @@ public class PlayerManager : Singleton<PlayerManager>
     // Update is called once per frame
     void Update()
     {
-        
+        if (isPlayerDead == true) 
+        {
+            isPlayerDead = false;
+            OnPlayerDeath?.Invoke();
+        }
     }
 
     public void PlusHealth(int health)
@@ -40,5 +50,15 @@ public class PlayerManager : Singleton<PlayerManager>
         playerData.attackPower += power;
         UIManager.Instance.SetAttackValue(playerData.attackPower);
         playerController.RefreshPlayerData();
+    }
+
+    public void DamagePlayer(int damage)
+    {
+        playerController.Damage(damage);
+        if (playerData.health <= 0 && !isPlayerDead)
+        {
+            isPlayerDead = true;
+            OnPlayerDeath?.Invoke();
+        }
     }
 }

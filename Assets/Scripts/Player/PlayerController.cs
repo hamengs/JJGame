@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     private Transform attackCheckPoint;
     public GameObject ghost;
 
+
     //----------Character attributes----------
     [Header("Player Attributes")]
     public int hp;
@@ -31,6 +32,8 @@ public class PlayerController : MonoBehaviour
     public int facingDirection = 1;
     public float walkSlideJumpXSpeed;
     private bool canMove = true;
+    private bool YvelocityReset = true;
+    public float gravity = 3f;
 
     //----------Dash--------------
     public float dashSpeedScale;
@@ -103,6 +106,11 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            Death();
+        }
+
         if (playerState == PlayerStates.Death)
         {
             return;
@@ -129,10 +137,11 @@ public class PlayerController : MonoBehaviour
         return true;
     }
 
-    private void Death()
+    public void Death()
     {
         playerAnimator.SetTrigger("Death");
         playerState = PlayerStates.Death;
+        PlayerManager.Instance.isPlayerDead = true;
         Destroy(this.gameObject, 5f);
     }
 
@@ -269,6 +278,12 @@ public class PlayerController : MonoBehaviour
         if (isGrounded())
         {
             playerAnimator.SetBool("Grounded", true);
+            playerAnimator.SetBool("WallSlide", false);
+            if (YvelocityReset == true)
+            {
+                playerRigidbody.linearVelocityY = 0;
+                YvelocityReset = false;
+            }
             if (playerRigidbody.linearVelocity == Vector2.zero)
             {
                 playerState = PlayerStates.Idle;
@@ -327,6 +342,7 @@ public class PlayerController : MonoBehaviour
         if (playerRigidbody.linearVelocityY > 0 && !isGrounded())
         {
             playerState = PlayerStates.Jump;
+            YvelocityReset = true;
             playerAnimator.SetTrigger("Jump");
         }
 
@@ -342,7 +358,7 @@ public class PlayerController : MonoBehaviour
         if (!isGrounded()&&playerRigidbody.linearVelocityY<0)
         {
             //Right wall slide
-            if (IsWallSilde() == 0)
+            if (IsWallSilde() == 1)
             {
 
                 playerState = PlayerStates.WalkSlide;
@@ -352,17 +368,18 @@ public class PlayerController : MonoBehaviour
             }
 
             //Left wall slide
-            if (IsWallSilde() == 1)
+            if (IsWallSilde() == -1)
             {
 
                 playerState = PlayerStates.WalkSlide;
                 playerAnimator.SetBool("WallSlide", true);
             }
 
-            if (IsWallSilde() == -1)
+            if (IsWallSilde() == 0)
             {
                 playerAnimator.SetBool("WallSlide", false);
             }
+
         }
         //Change gravity when Walking Slide
         if(playerState == PlayerStates.WalkSlide)
@@ -371,7 +388,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            ChangeGravity(2.0f);
+            ChangeGravity(gravity);
         }
 
 
@@ -476,9 +493,9 @@ public class PlayerController : MonoBehaviour
         }
         if (hitRight.collider != null)
         {
-            return 0;
+            return -1;
         }
-        return -1;
+        return 0;
     }
 
     public void Damage(int damage)
