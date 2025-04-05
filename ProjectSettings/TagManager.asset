@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Enemy
   - DeadZone
+  - NPC
+  - CinemachineCamera
+  - Canvas
   layers:
   - Default
   - TransparentFX
@@ -24,7 +27,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - Portal
   - 
   - 
   - 

@@ -12,30 +12,18 @@ public class ItemContextMenu : MonoBehaviour
 
     public void OnUseButtonClicked()
     {
-        // 调用物品的使用方法或发送通知
         Debug.Log("使用物品: " + linkedSlot.itemData.itemName);
-        if (linkedSlot.itemData.itemType == Item.ItemType.Potion)
-        {
-            //通过调用玩家数据manager来加血量
-            PlayerManager.Instance.PlusHealth(linkedSlot.itemData.healthPlus);
-        }
-        if (linkedSlot.itemData.itemType == Item.ItemType.Food)
-        {
-            //通过调用玩家数据manager来加血量或者攻击力
-            PlayerManager.Instance.PlusHealth(linkedSlot.itemData.healthPlus);
-            PlayerManager.Instance.PlusAttackPower(linkedSlot.itemData.attackPlus);
-        }
-        UIManager.Instance.inventory.items.Remove(linkedSlot.itemData);
-        UIManager.Instance.RefreshInventoryUI();
-
+        InventoryManager.Instance.UseItem(linkedSlot.itemData);
+        // 如果使用后希望关闭上下文菜单，可以在这里销毁它
+        Destroy(gameObject);
     }
 
     public void OnDropButtonClicked()
     {
         Debug.Log("丢弃物品: " + linkedSlot.itemData.itemName);
-        // 根据需要执行丢弃逻辑，例如从 InventoryData 中移除，并刷新 UI
-        UIManager.Instance.inventory.items.Remove(linkedSlot.itemData);
-        UIManager.Instance.RefreshInventoryUI();
+        InventoryManager.Instance.RemoveItem(linkedSlot.itemData);
+        Destroy(gameObject);
     }
 }
+
 

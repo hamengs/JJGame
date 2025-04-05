@@ -4,7 +4,6 @@ using UnityEngine;
 public class Skeleton : Enemy
 {
     //Attack
-    private Transform attackCheckPoint;
     public float attackCooldown = 1.0f;  
     private float attackTimer = 0f;
 
@@ -15,14 +14,15 @@ public class Skeleton : Enemy
     public PlayerController player; 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    private void Start()
+    protected override void Start()
     {
         base.Start();
         attackCheckPoint = transform.Find("AttackCheckPoint");
+        player = PlayerManager.Instance.playerController;
 
     }
 
-    private void Update()
+    protected override void Update()
     {
         if (DeathCheck())
         {

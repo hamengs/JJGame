@@ -21,7 +21,7 @@ public class Spikes : MonoBehaviour
     {
         if (collision.gameObject.tag == ("Player"))
         {
-            PlayerManager.Instance.DamagePlayer(damage);
+            PlayerManager.Instance.playerController.Damage(damage);
         }
     }
 }

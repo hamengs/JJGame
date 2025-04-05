@@ -7,4 +7,11 @@ public class PlayerData : ScriptableObject
     public int health;
     public int money;
     public int attackPower;
+
+    public void ResetData()
+    {
+        health = 100;
+        money = 5;
+        attackPower = 5;
+    }
 }

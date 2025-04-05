@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class UIManager : Singleton<UIManager>
 {
@@ -10,153 +11,222 @@ public class UIManager : Singleton<UIManager>
     public InventoryData inventory;
 
     [Header("UI References")]
-    [SerializeField] private Canvas canvas;           // 直接拖拽 Canvas
+    [SerializeField] public Canvas canvas;           
     [SerializeField] public GameObject canvasObject;   
-    [SerializeField] private Transform inventoryPanel;  // 背包面板
-    [SerializeField] private GameObject inventorySlotPrefab;
+    [SerializeField] public Transform inventoryPanel;  // 背包面板
+    [SerializeField] public GameObject inventorySlotPrefab;
 
-    public TextMeshProUGUI health;
-    public TextMeshProUGUI money;
-    public TextMeshProUGUI attack;
     public GameObject inventoryGameObject;
     public Button closeButton;
     public GameObject deadInformation;
     public Button restartButton;
     public Button exitButton;
 
+    public CanvasGroup inventoryGroup;
+    public CanvasGroup deadInformationGroup;
 
 
-    private void Awake()
+
+
+    protected override void Awake()
     {
         base.Awake();
-
+        SceneManager.sceneLoaded += OnSceneLoaded;
 
     }
 
     private void Start()
     {
-        // 初始化值
-        health.text = "Health: " + PlayerManager.Instance.playerData.health;
-        money.text = "Money: " + PlayerManager.Instance.playerData.money;
-        attack.text = "Attack: " + PlayerManager.Instance.playerData.attackPower;
 
-        deadInformation.SetActive(false);
-        inventory.items = new List<Item>();
         RefreshInventoryUI();
-
-        // 默认关闭背包，隐藏 Canvas
- 
+        // 默认关闭背包
+        if (SceneManager.GetActiveScene().name!="SceneMenu")
+        {
             HideInventory();
-        
-        
+        }
+        HideDeathInformation();
+
+        if (PlayerManager.Instance != null)
+        {
+            PlayerManager.Instance.OnPlayerDeath += OnPlayerDeathHandler;
+        }
+    }
+
+    protected override void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        if (PlayerManager.Instance != null)
+        {
+            PlayerManager.Instance.OnPlayerDeath -= OnPlayerDeathHandler;
+        }
+        base.OnDestroy();
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.B) && canvas.enabled == false)
+        if (Input.GetKeyDown(KeyCode.B)&&inventoryGroup.alpha==0)
         {
             ShowInventory();
         }
-        else if (Input.GetKeyDown(KeyCode.B) && canvas.enabled == true)
+        else if (Input.GetKeyDown(KeyCode.B) && inventoryGroup.alpha == 1)
         {
             HideInventory();
         }
     }
 
-    public void AddItemToInventory(Item item)
+    public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        inventory.items.Add(item);
-        RefreshInventoryUI();
+        if (canvasObject == null)
+        {
+            canvasObject = GameObject.FindGameObjectWithTag("Canvas");
+            if (canvasObject != null)
+            {
+                canvas = canvasObject.GetComponent<Canvas>();
+            }
+            else
+            {
+                Debug.LogWarning("未找到canvas");
+            }
+        }
     }
+
+
 
     public void RefreshInventoryUI()
     {
+        // 使用 InventoryManager 中的数据，
         Dictionary<Item, int> itemCount = new Dictionary<Item, int>();
-        foreach (Item item in inventory.items)
+        foreach (Item item in InventoryManager.Instance.inventoryData.items)
         {
             if (itemCount.ContainsKey(item))
                 itemCount[item]++;
             else
                 itemCount[item] = 1;
         }
-
-        foreach (Transform child in inventoryPanel)
+        if (inventoryPanel != null)
         {
-            Destroy(child.gameObject);
+            // 清空 InventoryPanel 中的现有槽位
+            foreach (Transform child in inventoryPanel)
+            {
+                Destroy(child.gameObject);
+            }
+
+            // 根据统计结果实例化道具槽位
+            foreach (var pair in itemCount)
+            {
+                GameObject slotGO = Instantiate(inventorySlotPrefab, inventoryPanel);
+                InventorySlot slot = slotGO.GetComponent<InventorySlot>();
+                slot.SetSlot(pair.Key, pair.Value);
+            }
         }
 
-        foreach (var item in itemCount)
-        {
-            GameObject slotGO = Instantiate(inventorySlotPrefab, inventoryPanel);
-            InventorySlot slot = slotGO.GetComponent<InventorySlot>();
-            slot.SetSlot(item.Key, item.Value);
-        }
     }
+
 
     public void ShowInventory()
     {
-        if (canvasObject != null)
-        {
-            canvasObject.GetComponent<Canvas>().enabled = true;
-            RefreshInventoryUI();
-        }
+        inventoryGroup.alpha = 1f;            // 不透明
+        inventoryGroup.interactable = true;    // 可交互
+        inventoryGroup.blocksRaycasts = true;  // 阻挡射线
     }
 
     public void HideInventory()
     {
-        if (canvasObject != null)
+        inventoryGroup.alpha = 0f;            // 完全透明
+        inventoryGroup.interactable = false;    // 不可交互
+        inventoryGroup.blocksRaycasts = false;  // 不阻挡射线
+    }
+
+    public void HideDeathInformation()
+    {
+        if (deadInformationGroup != null)
         {
-            canvasObject.GetComponent<Canvas>().enabled = false;
-
+            deadInformationGroup.alpha = 0f;            // 完全透明
+            deadInformationGroup.interactable = false;    // 不可交互
+            deadInformationGroup.blocksRaycasts = false;  // 不阻挡射线
         }
+
     }
 
-    public void SetHealthValue(int value)
+    public void ShowDeathInformation()
     {
-        health.text = "Health: " + value;
+        if (deadInformationGroup != null)
+        {
+            deadInformationGroup.alpha = 1f;            // 透明
+            deadInformationGroup.interactable = true;    // 可交互
+            deadInformationGroup.blocksRaycasts = true;  // 阻挡射线
+        }
+
     }
 
-    public void SetMoneyValue(int value)
-    {
-        money.text = "Money: " + value;
-    }
-
-    public void SetAttackValue(int value)
-    {
-        attack.text = "Attack: " + value;
-    }
 
     public void OnStartButtonClicked()
     {
-        SceneManager.LoadSceneAsync("Scene1");
+        GameManager.Instance.LoadSceneAndStart("Scene1");
     }
 
     public void OnContinueButtonClicked()
     {
-        // 继续游戏逻辑
+        if (SaveManager.Instance.savedScene != null)
+        {
+            GameManager.Instance.LoadSceneAndContinue(SaveManager.Instance.savedScene);
+        }
+        else
+        {
+            Debug.Log("未找到存档");
+        }
+        
     }
 
     public void OnExitButtonClicked()
     {
+        SaveManager.Instance.SaveGame();
         Application.Quit();
     }
 
 
     public void OnRestartButtonClicked()
     {
-        SceneManager.LoadScene("Scene1");
+        SaveManager.Instance.LoadGame(); ;
     }
 
 
     public void GameOver()
     {
-        Debug.Log("Gameover");
         if (deadInformation != null)
         {
-            canvas.enabled = true;
-            inventoryGameObject.SetActive(false);
-            deadInformation.SetActive(true);
+            ShowDeathInformation();
         }
 
     }
+
+    public void SetCanvas(bool isEnabled)
+    {
+        if (isEnabled == true)
+        {
+            canvas.enabled = true;
+        }else if(isEnabled == false)
+        {
+            canvas.enabled = false;
+        }
+    }
+
+    public void SetInventory(bool isEnabled)
+    {
+        if (inventoryGameObject != null)
+        {
+            inventoryGameObject.SetActive(isEnabled);
+        }
+
+    }
+
+
+    // 回调，当玩家死亡时调用
+    private void OnPlayerDeathHandler()
+    {
+
+        GameOver();
+
+    }
+
 }

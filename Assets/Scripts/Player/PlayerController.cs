@@ -98,13 +98,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // 如果背包激活不处理玩家输入
-        if (UIManager.Instance.canvasObject.GetComponent<Canvas>().enabled==true)
-        {
-            playerRigidbody.linearVelocity = Vector2.zero;
-            playerState = PlayerStates.Idle;
-            return;
-        }
+        RefreshPlayerData();
 
         if (Input.GetKeyDown(KeyCode.L))
         {
@@ -131,18 +125,13 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    private bool Attack()
-    {
-        //TODO
-        return true;
-    }
 
     public void Death()
     {
         playerAnimator.SetTrigger("Death");
         playerState = PlayerStates.Death;
         PlayerManager.Instance.isPlayerDead = true;
-        Destroy(this.gameObject, 5f);
+        gameObject.SetActive(false);
     }
 
     private bool DeathCheck()
@@ -504,8 +493,7 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
-        PlayerManager.Instance.playerData.health -= damage;
-        hp = PlayerManager.Instance.playerData.health;
+        PlayerManager.Instance.DamagePlayer(damage);
         playerAnimator.SetTrigger("Hurt");
         if (hp < 0)
         {
@@ -655,6 +643,7 @@ public class PlayerController : MonoBehaviour
             dust.transform.localScale = scale;
         }
     }
+
 
     public void RefreshPlayerData()
     {

@@ -8,7 +8,7 @@ public class ItemObject : MonoBehaviour
     {
         if (collision.gameObject.tag == "Player")
         {
-            UIManager.Instance.AddItemToInventory(item);
+            InventoryManager.Instance.AddItem(item);
             Destroy(gameObject);
         }
     }
