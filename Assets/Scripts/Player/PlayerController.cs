@@ -76,7 +76,8 @@ public class PlayerController : MonoBehaviour
     //----------Dust----------
     [Header("Slide Dust")]
     public GameObject slideDustPrefab;        
-    public Transform slideDustSpawnPoint;     
+    public Transform slideDustSpawnPoint;
+
 
 
 

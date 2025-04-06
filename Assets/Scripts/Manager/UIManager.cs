@@ -21,9 +21,16 @@ public class UIManager : Singleton<UIManager>
     public GameObject deadInformation;
     public Button restartButton;
     public Button exitButton;
+    public GameObject EButton;
+    private GameObject currentEButton;
+
+    //chat shop
+    public ChatAndShop chatAndShop;
+    private int currentDialogueIndex;
 
     public CanvasGroup inventoryGroup;
     public CanvasGroup deadInformationGroup;
+    public CanvasGroup chatAndShopGroup;
 
 
 
@@ -38,14 +45,18 @@ public class UIManager : Singleton<UIManager>
     private void Start()
     {
 
+
         RefreshInventoryUI();
         // 默认关闭背包
         if (SceneManager.GetActiveScene().name!="SceneMenu")
         {
             HideInventory();
         }
+        //关闭死亡信息
         HideDeathInformation();
 
+        //关闭chat
+        HideChat();
         if (PlayerManager.Instance != null)
         {
             PlayerManager.Instance.OnPlayerDeath += OnPlayerDeathHandler;
@@ -125,16 +136,24 @@ public class UIManager : Singleton<UIManager>
 
     public void ShowInventory()
     {
-        inventoryGroup.alpha = 1f;            // 不透明
-        inventoryGroup.interactable = true;    // 可交互
-        inventoryGroup.blocksRaycasts = true;  // 阻挡射线
+        if (inventoryGroup != null)
+        {
+            inventoryGroup.alpha = 1f;            // 不透明
+            inventoryGroup.interactable = true;    // 可交互
+            inventoryGroup.blocksRaycasts = true;  // 阻挡射线
+        }
+
     }
 
     public void HideInventory()
     {
-        inventoryGroup.alpha = 0f;            // 完全透明
-        inventoryGroup.interactable = false;    // 不可交互
-        inventoryGroup.blocksRaycasts = false;  // 不阻挡射线
+        if (inventoryGroup != null)
+        {
+            inventoryGroup.alpha = 0f;            // 完全透明
+            inventoryGroup.interactable = false;    // 不可交互
+            inventoryGroup.blocksRaycasts = false;  // 不阻挡射线
+        }
+
     }
 
     public void HideDeathInformation()
@@ -226,6 +245,89 @@ public class UIManager : Singleton<UIManager>
     {
 
         GameOver();
+
+    }
+
+    public void ShowEButton(Vector3 position)
+    {
+        if (currentEButton == null)
+        {
+           currentEButton = Instantiate(EButton, position, Quaternion.identity);
+        }
+
+    }
+
+    public void HideEButton()
+    {
+        if (currentEButton != null)
+        {
+            Destroy(currentEButton);
+            currentEButton = null;
+        }
+    }
+
+    public void HideChat()
+    {
+        if (chatAndShopGroup != null)
+        {
+            chatAndShopGroup.alpha = 0f;
+            chatAndShopGroup.interactable = false;
+            chatAndShopGroup.blocksRaycasts = false;
+        }
+
+    }
+
+    public void ShowChat()
+    {
+        if (chatAndShopGroup != null)
+        {
+            chatAndShopGroup.alpha = 1f;
+            chatAndShopGroup.interactable = true;
+            chatAndShopGroup.blocksRaycasts = true;
+        }
+
+        StartDialogue();
+    }
+
+    public void StartDialogue()
+    {
+        chatAndShop.npcNameText.text = chatAndShop.npcData.npcName;
+        currentDialogueIndex = 0;
+        chatAndShop.dialogueText.text = chatAndShop.npcData.dialogueData.dialogueText[currentDialogueIndex];
+        if (chatAndShop.npcData.dialogueData.dialogueText.Count == 1)
+        {
+            chatAndShop.nextButtonText.text = "Done";
+        }
+        else
+        {
+            chatAndShop.nextButtonText.text = "Next";
+        }
+
+
+    }
+
+    public void OnChatNextButtonClicked()
+    {
+        int count = chatAndShop.npcData.dialogueData.dialogueText.Count;
+        currentDialogueIndex++;
+        //最后一次关闭chat
+        if (currentDialogueIndex == count)
+        {
+            HideChat();
+        }
+        if (currentDialogueIndex<count)
+        {
+            if (currentDialogueIndex == count - 1)
+            {
+                chatAndShop.nextButtonText.text = "Done";
+            }
+            chatAndShop.dialogueText.text = chatAndShop.npcData.dialogueData.dialogueText[currentDialogueIndex];
+        }
+
+    }
+
+    public void OnShopButtonClicked()
+    {
 
     }
 

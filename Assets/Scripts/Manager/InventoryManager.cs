@@ -48,7 +48,7 @@ public class InventoryManager : Singleton<InventoryManager>
             PlayerManager.Instance.PlusHealth(item.healthPlus);
             PlayerManager.Instance.PlusAttackPower(item.attackPlus);
         }
-        // 如果需要其他类型的道具逻辑，继续添加
+        
         RemoveItem(item);
     }
 }

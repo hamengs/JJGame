@@ -4513,6 +4513,7 @@ MonoBehaviour:
   deadInformation: {fileID: 0}
   restartButton: {fileID: 0}
   exitButton: {fileID: 0}
+  EButton: {fileID: 3636618474535601029, guid: c3fcda5b3a42fb441834e5b3a8c47663, type: 3}
   inventoryGroup: {fileID: 0}
   deadInformationGroup: {fileID: 0}
 --- !u!4 &1790445321 stripped

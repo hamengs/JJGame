@@ -94,11 +94,11 @@ public class GameManager : Singleton<GameManager>
         // 在这里执行场景加载后的初始化，比如重置UI、数据等
         UIManager.Instance.HideDeathInformation();
         UIManager.Instance.HideInventory();
+        UIManager.Instance.HideChat();
         SaveManager.Instance.savedScene = null;
         InventoryManager.Instance.inventoryData.items.Clear();
         PlayerManager.Instance.playerData.ResetData();
-
-        // 删除存档键，确保之前保存的 prefab 注册表数据也清除掉
+        PlayerManager.Instance.ChangeHealth(0);
         PlayerPrefs.DeleteKey("GameSaveData");
         PlayerPrefs.Save();
 

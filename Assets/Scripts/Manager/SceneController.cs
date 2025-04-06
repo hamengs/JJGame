@@ -38,10 +38,7 @@ public class SceneController : Singleton<SceneController>
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            Transition(currentPortal);
-        }
+
     }
 
     public void Transition(TransitionPoint source)

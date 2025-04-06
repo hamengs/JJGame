@@ -16,6 +16,15 @@ public class TransitionPoint : MonoBehaviour
     public TransitionTo transitionTo;
     public TransitionDestination transitionDestination;
     public bool hasSaved;
+    private bool canTeleport;
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.E)&&canTeleport&& transitionTo != TransitionTo.Spawn)
+        {
+            SceneController.Instance.Transition(SceneController.Instance.currentPortal);
+        }
+    }
 
 
     public void OnTriggerStay2D(Collider2D collision)
@@ -24,11 +33,18 @@ public class TransitionPoint : MonoBehaviour
         {
             SceneController.Instance.inTransitionArea = true;
             SceneController.Instance.currentPortal = this;
+            canTeleport = true;
             if (!hasSaved)
             {
                 SaveManager.Instance.SaveGame();
                 hasSaved = true;
             }
+            if (transitionTo != TransitionTo.Spawn)
+            {
+                UIManager.Instance.ShowEButton(transform.position + new Vector3(0, 2f, 0));
+            }
+           
+
 
         }
     }
@@ -39,6 +55,8 @@ public class TransitionPoint : MonoBehaviour
         {
             SceneController.Instance.inTransitionArea = false;
             hasSaved = false;
+            canTeleport = false;
+            UIManager.Instance.HideEButton();
             StartCoroutine(DelayedReset());
         }
     }

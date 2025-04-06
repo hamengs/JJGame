@@ -157,10 +157,11 @@ public class SaveManager : Singleton<SaveManager>
                 UIManager.Instance.HideDeathInformation();
             }
 
-            //同样的把canvas设置为false不然背包会显示出来
+            //同样的把设置背包对话,不然背包和对话会显示出来
             if (SceneManager.GetActiveScene().name != "SceneMenu")
             {
                 UIManager.Instance.HideInventory();
+                UIManager.Instance.HideChat();
             }
 
 
